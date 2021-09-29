@@ -51,7 +51,7 @@ export async function findDocumentById<T>(connection: IConnection, collection: s
 }
 
 /**
- * Get document by in a sub collection by its id.
+ * Get sub collection document identified by subColId.
  *
  * @param {IConnection} connection
  * @param {string} collection
@@ -80,6 +80,7 @@ export async function getSubCollectionDocById<T>(
 
 /**
  * Get document snapShot by id.
+ * Any changes in the document identified by the doc id will get the snapshot changes.
  *
  * @param {IConnection} connection
  * @param {string} collection

@@ -92,9 +92,10 @@ export function createBaseModel(resolver: IConnection | {} = {}): object {
     }
 
     /**
-     * Get document snapShot by its id.
+     * Get document snapShot by id.
+     * Any changes in the document identified by the doc id will get the snapshot changes.
      *
-     * @param {Number} docId
+     * @param {any} docId
      * @param {Function} callback
      *
      * @returns {Promise<Response>}
@@ -200,7 +201,7 @@ export function createBaseModel(resolver: IConnection | {} = {}): object {
     }
 
     /**
-     * Get data from sub collection by its id.
+     * Get sub collection document identified by subColId.
      *
      * @param {any} docId
      * @param {string} subCollection
