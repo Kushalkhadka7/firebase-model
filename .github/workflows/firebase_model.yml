@@ -15,14 +15,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
-      - name: Use Node 12
+      - name: Install Node
         uses: actions/setup-node@v1
         with:
           node-version: '14'
 
       - name: Install Dependencies
-        run: yarn
+        run: yarn cache clean && yarn
 
       - name: Build package
         run: yarn build
