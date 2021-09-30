@@ -5,12 +5,12 @@
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint ./src --ext .ts",
+    "tsc:watch": "tsc -w",
     "clean": "rimraf build",
-    "build": "yarn clean && yarn tsc --project tsconfig.json",
+    "lint": "eslint ./src --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "test:watch": "tsc -w"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "yarn clean && yarn tsc --project tsconfig.json"
   },
   "author": "",
   "license": "ISC",
