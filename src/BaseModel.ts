@@ -2,18 +2,23 @@ import * as db from './db';
 import * as storage from './storage';
 import { Firestore } from 'firebase/firestore';
 import { FirebaseStorage } from 'firebase/storage';
-import Response, { SubCollectionPayload, FilterOptionsParam, IConnection, ResponseWithCallback } from './types';
+import Response, {
+  DocId,
+  IConnection,
+  CallBackFunc,
+  PaginationParams,
+  ResponseWithCallback,
+  SubCollectionPayload,
+} from './types';
 
 /**
- * Base model for fire store.
+ * Base model for firestore and firebase storage.
  *
- * @param {Object} resolver
+ * @param {IConnection} resolver
  *
- * @returns {Object}
+ * @returns {object}
  */
 export function createBaseModel(resolver: IConnection | {} = {}): object {
-  console.log('i am called', resolver);
-
   /**
    * Base class.
    */
@@ -25,7 +30,7 @@ export function createBaseModel(resolver: IConnection | {} = {}): object {
     /**
      * Bind connection to respective types.
      *
-     * @param {Object} connection
+     * @param {IConnection} connection
      *
      * @returns {void}
      */
@@ -41,8 +46,6 @@ export function createBaseModel(resolver: IConnection | {} = {}): object {
 
     /**
      * Establish connection.
-     *
-     * @returns {Object}
      */
     public static getConnection() {
       if (this.firestore) {
@@ -61,7 +64,7 @@ export function createBaseModel(resolver: IConnection | {} = {}): object {
     }
 
     /**
-     * Get all documents from a collection.
+     * Fetch all documents in a collection.
      *
      * @returns {Promise<Response>}
      */
@@ -70,30 +73,35 @@ export function createBaseModel(resolver: IConnection | {} = {}): object {
     }
 
     /**
-     * Get document snapShot on any value changes on the document.
+     * Get document snapShot.
+     * Any changes in the collection will get the snapshot changes.
+     * So ,it's like subscribing,it will keep listening to the collection update,
+     * So in every change on the collection callback will execute with the added payload.
      *
-     * @param {Function} callback
+     * @param {CallBackFunc} callback
      *
      * @returns {Promise<ResponseWithCallback>}
      */
-    static fetchDocsOnSnapShotChange(callback: any): Promise<ResponseWithCallback> {
+    static fetchDocsOnSnapShotChange(callback: CallBackFunc): Promise<ResponseWithCallback> {
       return db.fetchDocsOnSnapShotChange(this.getConnection(), this.collection, callback);
     }
 
     /**
-     * Get document by its document id..
+     * Get document identified by its document id.
      *
-     * @param {any} docId
+     * @param {DocId} docId
      *
      * @returns {Promise<Response>}
      */
-    public static async findDocumentById<T>(docId: any): Promise<Response> {
+    public static async findDocumentById<T>(docId: DocId): Promise<Response> {
       return db.findDocumentById<T>(this.getConnection(), this.collection, docId);
     }
 
     /**
-     * Get document snapShot by id.
+     * Get document snapShot by identified by id.
      * Any changes in the document identified by the doc id will get the snapshot changes.
+     * So ,it's like subscribing,it will keep listening to the document update,
+     * So in every change on the document identified by docId, the call back will execute with the added payload.
      *
      * @param {any} docId
      * @param {Function} callback
@@ -107,113 +115,134 @@ export function createBaseModel(resolver: IConnection | {} = {}): object {
     /**
      * Save document to a collection.
      *
-     * @param {any} docId
-     * @param {T} payload
-     *
-     * @returns {Promise<Response>}
-     */
-    public static save<T>(docId: any, payload: T): Promise<Response> {
-      return db.save<T>(this.getConnection(), this.collection, docId, payload);
-    }
-
-    /**
-     * Update document by document id.
-     *
-     * @param {any} docId
-     * @param {T} payload
-     */
-    public static updateDocumentById<T>(docId: any, payload: T): Promise<Response> {
-      return db.updateDocumentById<T>(this.getConnection(), this.collection, docId, payload);
-    }
-
-    /**
-     * Update document by id and fetch the latest changes and return the payload.
-     *
-     * @param {any} docId
+     * @param {DocId} docId
      * @param {any} payload
      *
      * @returns {Promise<Response>}
      */
-    public static updateDocumentByIdWithPayload<T>(docId: any, payload?: any): Promise<Response> {
+    public static save<T>(docId: DocId, payload: any): Promise<Response> {
+      return db.save<T>(this.getConnection(), this.collection, docId, payload);
+    }
+
+    /**
+     * Update document identified by docId.
+     *
+     * @param {DocId} docId
+     * @param {any} payload
+     *
+     * @returns {Promise<Response>}
+     */
+    public static updateDocumentById<T>(docId: DocId, payload: any): Promise<Response> {
+      return db.updateDocumentById<T>(this.getConnection(), this.collection, docId, payload);
+    }
+
+    /**
+     * Update document identified by docId.
+     * Updates the doc and the fetches the document again , to make it up to date with the doc on db,
+     * and return the latest fetched data.
+     *
+     * @param {DocId} docId
+     * @param {any} payload
+     *
+     * @returns {Promise<Response>}
+     */
+    public static updateDocumentByIdWithPayload<T>(docId: DocId, payload?: any): Promise<Response> {
       return db.updateDocumentByIdWithPayload<T>(this.getConnection(), this.collection, docId, payload);
     }
 
     /**
-     * Fetch data with pagination.
+     * Fetch document with pagination.
+     * Also order the document so need to provide field by which the order will take place.
+     * eg. {field:"name",type:"asc",startIndex:0,endIndex:50}
      *
-     * @param {object} filterOptions
+     * @param {PaginationParams} paginationPayload
      *
      * @returns {Promise<Response>}
      */
-    public static fetchDataWithPagination<T>(filterOptions: FilterOptionsParam | {} = {}): Promise<Response> {
-      if (!Object.keys(filterOptions).length) {
-        filterOptions = {
+    public static fetchDataWithPagination<T>(paginationPayload: PaginationParams | {} = {}): Promise<Response> {
+      if (!Object.keys(paginationPayload).length) {
+        paginationPayload = {
+          field: '',
+          type: 'asc',
           startIndex: 0,
-          paginationLimit: 5,
+          endIndex: 50,
         };
       }
 
-      return db.fetchDataWithPagination<T>(this.getConnection(), this.collection, filterOptions as FilterOptionsParam);
+      return db.fetchDataWithPagination<T>(
+        this.getConnection(),
+        this.collection,
+        paginationPayload as PaginationParams
+      );
     }
 
     /**
-     * Fetch data with pagination.
+     * Fetch document with pagination.
+     * Also order the document so need to provide field by which the order will take place.
+     * eg. {field:"name",type:"asc",startIndex:0,endIndex:50}
      *
-     * @param {any} docId
+     * @param {DocId} docId
      * @param {string} subCollection
-     * @param {object} filterOptions
+     * @param {object} paginationPayload
      *
      * @returns {Promise<Response>}
      */
     public static fetchSubColDataWithPagination<T>(
-      docId: any,
+      docId: DocId,
       subCollection: string,
-      filterOptions: any = {}
+      paginationPayload: PaginationParams | {}
     ): Promise<Response> {
-      if (!Object.keys(filterOptions).length) {
-        filterOptions = {
+      if (!Object.keys(paginationPayload).length) {
+        paginationPayload = {
           field: '',
           type: 'asc',
-          paginationLimit: 5,
+          startIndex: 0,
+          endIndex: 50,
         };
       }
-
       return db.fetchSubColDataWithPagination<T>(
         this.getConnection(),
         this.collection,
         docId,
         subCollection,
-        filterOptions
+        paginationPayload as PaginationParams
       );
     }
 
     /**
-     * Get data from sub collection.
+     * Fetch all documents from sub collection.
+     * Also filter options can send to order the documents.
+     * It will order the document according to provided options
+     * eg. field = 'name' and type = 'asc'
      *
-     * @param {any} docId
+     * @param {DocId} docId
      * @param {string} subCollection
-     * @param {any} filterOptions
+     * @param {{ field: string; type: string }} filterOptions
      *
      * @returns {Promise<Response>}
      */
-    public static getSubCollectionData<T>(docId: any, subCollection: string, filterOptions?: any): Promise<Response> {
-      return db.getSubCollectionData<T>(this.getConnection(), this.collection, docId, subCollection, filterOptions);
+    public static getAllSubCollectionDocs<T>(
+      docId: DocId,
+      subCollection: string,
+      filterOptions?: { field: string; type: string }
+    ): Promise<Response> {
+      return db.getAllSubCollectionDocs<T>(this.getConnection(), this.collection, docId, subCollection, filterOptions);
     }
 
     /**
      * Get sub collection document identified by subColId.
      *
-     * @param {any} docId
+     * @param {DocId} docId
      * @param {string} subCollection
      *
      * @returns {Promise<Response>}
      */
-    public static getSubCollectionDocById<T>(docId: any, subCollection: string, subColId: any): Promise<Response> {
+    public static getSubCollectionDocById<T>(docId: DocId, subCollection: string, subColId: any): Promise<Response> {
       return db.getSubCollectionDocById<T>(this.getConnection(), this.collection, docId, subCollection, subColId);
     }
 
     /**
-     * Add data to a sub collection.
+     * Add data to a sub collection, merge on conflict.
      *
      * @param {AddSubCollectionDataPayload} payload
      *
@@ -235,7 +264,9 @@ export function createBaseModel(resolver: IConnection | {} = {}): object {
     }
 
     /**
-     * Update sub collection document identified by subColDocId and returns the updated payload.
+     * Update sub collection document identified by subColDocId.
+     * Updates the doc and the fetches the document again , to make it up to date with the doc on db,
+     * and return the latest fetched data.
      *
      * @param {SubCollectionPayload<T>} payload
      *
@@ -248,24 +279,24 @@ export function createBaseModel(resolver: IConnection | {} = {}): object {
     /**
      * Delete collection doc identified by id.
      *
-     * @param {any} docId
+     * @param {DocId} docId
      *
      * @returns {Promise <Response>}
      */
-    public static deleteCollectionDocById<T>(docId: any): Promise<Response> {
+    public static deleteCollectionDocById<T>(docId: DocId): Promise<Response> {
       return db.deleteCollectionDocById<T>(this.getConnection(), this.collection, docId);
     }
 
     /**
-     * Delete sub collection doc identified by it subColDocId.
+     * Delete sub collection doc identified by subColDocId.
      *
-     * @param {any} docId
-     * @param {any} subColDocId
+     * @param {DocId} docId
+     * @param {DocId} subColDocId
      * @param {string} subCol
      *
      * @returns {Promise <Response>}
      */
-    public static deleteSubColDocById<T>(docId: any, subCol: string, subColDocId: any): Promise<Response> {
+    public static deleteSubColDocById<T>(docId: DocId, subCol: string, subColDocId: DocId): Promise<Response> {
       return db.deleteSubColDocById<T>(this.getConnection(), this.collection, docId, subCol, subColDocId);
     }
 
@@ -333,12 +364,12 @@ export function createBaseModel(resolver: IConnection | {} = {}): object {
     /**
      * Delete docs from sub collection in batch.
      *
-     * @param {any} eventId
+     * @param {DocId} docId
      * @param {string} subCollection
      *
      * @returns {Promise <Response>}
      */
-    public static deleteAllDocsFromSubCollection<T>(eventId: any, subCollection: string): Promise<Response> {
+    public static deleteAllDocsFromSubCollection<T>(eventId: DocId, subCollection: string): Promise<Response> {
       return db.deleteAllDocsFromSubCollection<T>(this.getConnection(), this.collection, eventId, subCollection);
     }
 
@@ -354,14 +385,14 @@ export function createBaseModel(resolver: IConnection | {} = {}): object {
     /**
      * Add or update data in sub collection in batch.
      *
-     * @param {any} eventId
+     * @param {DocId} docId
      * @param {string} subCollection
      * @param {any} payload
      *
      * @returns {Promise <Response>}
      */
-    public static updateSubCollectionInBatch<T>(eventId: any, subCollection: string, payload: any): Promise<Response> {
-      return db.updateSubCollectionInBatch<T>(this.getConnection(), this.collection, eventId, subCollection, payload);
+    public static updateSubCollectionInBatch<T>(docId: DocId, subCollection: string, payload: any): Promise<Response> {
+      return db.updateSubCollectionInBatch<T>(this.getConnection(), this.collection, docId, subCollection, payload);
     }
 
     /**

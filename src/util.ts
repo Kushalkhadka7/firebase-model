@@ -1,9 +1,9 @@
-import Response, { ResponseWithCallback } from './types';
+import Response, { CallBackFunc, ResponseWithCallback } from './types';
 
 /**
  * Generate success payload.
  *
- * @param {Object} data
+ * @param {object} data
  * @param {string} message
  *
  * @returns {Response}
@@ -18,7 +18,7 @@ export function successResponse<T>(data: T | T[], message: string): Response {
 }
 
 /**
- * Generate success payload.
+ * Generate not found response.
  *
  * @param {string} message
  *
@@ -50,7 +50,7 @@ export function operationFailed(message: string): Response {
 }
 
 /**
- * Generate success payload.
+ * Generate error response.
  *
  * @param {Error} err
  * @param {String} message
@@ -67,15 +67,15 @@ export function errorResponse(err: Error, message: string): Response {
 }
 
 /**
- * Generate success payload.
+ * Generate snapShot response.
  *
  * @param {Function} unSubscriber
  * @param {String} status
- * @param {Function} callback
+ * @param {CallBackFunc} callback
  *
- * @returns {Response}
+ * @returns {ResponseWithCallback}
  */
-export function snapShotResponse(unSubscriber: any, status: string, callback?: any): ResponseWithCallback {
+export function snapShotResponse(unSubscriber: any, status: string, callback?: CallBackFunc): ResponseWithCallback {
   return {
     error: null,
     status: status,
@@ -85,12 +85,12 @@ export function snapShotResponse(unSubscriber: any, status: string, callback?: a
 }
 
 /**
- * Generate snapShotErrorResponse payload.
+ * Generate snapShotError response.
  *
  * @param {string} message
  * @param {Error} error
  *
- * @returns {Response}
+ * @returns {ResponseWithCallback}
  */
 export function snapShotErrorResponse(error?: Error, message?: string): ResponseWithCallback {
   return {

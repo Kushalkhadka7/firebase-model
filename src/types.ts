@@ -14,8 +14,8 @@ export interface ResponseWithCallback {
 }
 
 export interface IConnection {
-  firestore: any;
   storage: any;
+  firestore: any;
 }
 
 export interface FilterOptionsParam {
@@ -29,6 +29,21 @@ export interface SubCollectionPayload<T> {
   docId: any;
   subColDocId: any;
   subCollection: string;
+}
+
+export interface PaginationParams {
+  type: string;
+  field: string;
+  endIndex: number;
+  startIndex: number;
+}
+
+export type DocId = number | string;
+export type CallBackFunc = (snapshot: any) => void;
+
+export interface FilterOptions {
+  type: string;
+  field: string;
 }
 
 export default Response;
