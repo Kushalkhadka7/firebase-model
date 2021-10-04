@@ -9,7 +9,7 @@
     "url": "https://github.com/Kushalkhadka7/firebase-model"
   },
   "publishConfig": {
-    "registry": "git://github.com/Kushalkhadka7/firebase-model.git"
+    "registry": "https://github.com/Kushalkhadka7/firebase-model.git"
   },
   "description": "Firebase model",
   "main": "index.js",
