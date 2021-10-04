@@ -25,14 +25,14 @@ jobs:
           registry-url: https://npm.pkg.github.com/
 
       - name: Install Dependencies
-        run: yarn cache clean && yarn
+        run: npm install
 
       - name: Build package
-        run: yarn build
+        run: npm run build
 
       - run: echo "registry=https://npm.pkg.github.com/@Kushalkhadka7" >> .npmrc
 
       - name: Publish new release
-        run: yarn publish
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
