@@ -28,3 +28,8 @@ jobs:
 
       - name: Build package
         run: yarn build
+
+      - name: Publish new release
+        run: yarn publish
+        env:
+          TOKEN: ${{secrets.TOKEN}}

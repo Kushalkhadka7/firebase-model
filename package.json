@@ -1,5 +1,9 @@
 {
   "name": "firebase-model",
+   "repository": {
+    "type": "git",
+    "url": "https://github.com/Kushalkhadka7/firebase-model"
+  },
   "version": "1.0.0",
   "description": "Firebase model",
   "main": "index.js",
