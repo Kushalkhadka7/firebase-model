@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: '12.x'
           registry-url: 'https://registry.npmjs.org'
-          scope: '@kushalkhadka7'
+          scope: 'Kushalkhadka7'
 
       - name: Install Dependencies
         run: yarn cache clean && yarn
