@@ -33,4 +33,4 @@ jobs:
       - name: Publish new release
         run: yarn publish
         env:
-          TOKEN: ${{ secrets.TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
