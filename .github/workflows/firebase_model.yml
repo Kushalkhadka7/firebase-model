@@ -32,4 +32,4 @@ jobs:
       - name: Publish new release
         run: yarn publish
         env:
-          TOKEN: ${{secrets.TOKEN}}
+          TOKEN: ${{ secrets.TOKEN }}
