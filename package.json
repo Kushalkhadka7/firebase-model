@@ -1,7 +1,10 @@
 {
   "version": "1.0.1",
   "name": "firebase-model",
-   "repository": {
+  "authors": [
+    "Kushal Khadka <crkushal7@gmail.com>"
+  ],
+  "repository": {
     "type": "git",
     "url": "https://github.com/Kushalkhadka7/firebase-model"
   },
@@ -14,9 +17,11 @@
     "tsc": "tsc",
     "tsc:watch": "tsc -w",
     "clean": "rimraf build",
+    "precommit": "lint-staged",
     "lint": "eslint ./src --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "prettify": "prettier --write '{src,test}/**/*.{ts,js}'",
     "build": "yarn clean && yarn tsc --project tsconfig.json"
   },
   "author": "",
@@ -24,6 +29,8 @@
   "dependencies": {
     "@types/firebase": "^3.2.1",
     "firebase": "^9.1.0",
+    "husky": "^4.2.5",
+    "lint-staged": "^11.2.0",
     "rimraf": "^3.0.2",
     "run-s": "^0.0.0",
     "tsc": "^2.0.3",
@@ -32,6 +39,26 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.31.2",
     "@typescript-eslint/parser": "^4.31.2",
-    "eslint": "^7.32.0"
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^6.11.0",
+    "prettier": "^2.4.1"
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "eslint .",
+      "eslint . --fix",
+      "prettier . --write",
+      "yarn prettify",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "engines": {
+    "node": ">= 10.16.0",
+    "yarn": ">= 1.16.0"
   }
 }
