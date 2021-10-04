@@ -48,8 +48,7 @@
       "eslint .",
       "eslint . --fix",
       "prettier . --write",
-      "yarn prettify",
-      "git add"
+      "yarn prettify"
     ]
   },
   "husky": {
