@@ -30,7 +30,7 @@ jobs:
       - name: Build package
         run: yarn build
 
-      - run: echo "registry=https://npm.pkg.github.com/@aaronpowell" >> .npmrc
+      - run: echo "registry=https://npm.pkg.github.com/@Kushalkhadka7" >> .npmrc
 
       - name: Publish new release
         run: yarn publish
